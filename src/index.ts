@@ -1,10 +1,10 @@
-import express, { type Request, type Response } from 'express';
+import express, { type Request, type Response } from "express";
 
 // import middleware
 import morgan from "morgan";
 
 // import database
-import { students } from '@db/db.js';
+import { students } from "@db/db.js";
 import { type Student, type Course } from "@libs/types.js";
 import {
   zStudentDeleteBody,
@@ -17,7 +17,7 @@ const port = process.env.PORT || 3000;
 
 // use middleware
 app.use(morgan("dev", { immediate: false }));
-app.use(express.json());    // parses request's payload into 'req.body'
+app.use(express.json()); // parses request's payload into 'req.body'
 
 // Endpoints
 app.get("/", (req: Request, res: Response) => {
@@ -28,26 +28,22 @@ app.get("/", (req: Request, res: Response) => {
 // get students (by program)
 app.get("/students", (req: Request, res: Response) => {
   try {
-    const program = req.query.program;
-
+    const program = req.query.program as string;
+    const studentId = req.query.studentId as string;
+    let result = [...students];
     if (program) {
-      let filtered_students = students.filter(
-        (student) => student.program === program
-      );
-      return res.json({
-        success: true,
-        data: filtered_students,
-      });
-    } else {
-      return res.json({
-        success: true,
-        count: students.length,
-        data: students,
-      });
+      result = students.filter((student) => student.program === program);
     }
+    if (studentId) {
+      result = students.filter((student) => student.studentId === studentId);
+    }
+    return res.json({
+      ok: true,
+      students: result,
+    });
   } catch (err) {
     return res.json({
-      success: false,
+      ok: false,
       message: "Something is wrong, please try again",
       error: err,
     });
@@ -71,7 +67,7 @@ app.post("/students", (req: Request, res: Response) => {
 
     //check duplicate studentId
     const found = students.find(
-      (student) => student.studentId === body.studentId
+      (student) => student.studentId === body.studentId,
     );
     if (found) {
       return res.json({
@@ -118,7 +114,7 @@ app.put("/students", (req: Request, res: Response) => {
 
     //check duplicate studentId
     const foundIndex = students.findIndex(
-      (student) => student.studentId === body.studentId
+      (student) => student.studentId === body.studentId,
     );
 
     if (foundIndex === -1) {
@@ -150,12 +146,51 @@ app.put("/students", (req: Request, res: Response) => {
 
 // DELETE /students, body = {studentId}
 app.delete("/students", (req: Request, res: Response) => {
-  res.json({
-    message: "Implement this!"
-  })
+  try {
+    const result = zStudentDeleteBody.safeParse(req.body);
+
+    if (!result.success) {
+      return res.status(400).json({
+        ok: false,
+        message: "Student Id must contain 9 characters",
+      });
+    }
+
+    const { studentId } = result.data;
+
+    const foundIndex = students.findIndex(
+      (student) => student.studentId === studentId,
+    );
+
+    if (foundIndex === -1) {
+      return res.status(404).json({
+        ok: false,
+        message: "Student ID does not exist",
+      });
+    }
+
+    students.splice(foundIndex, 1);
+
+    return res.json({
+      ok: true,
+      message: `Student Id ${studentId} has been deleted`,
+    });
+  } catch (err) {
+    return res.json({
+      ok: false,
+      message: "Something is wrong, please try again",
+      error: err,
+    });
+  }
 });
 
-// GET /api/me
+app.get("/api/me", (req: Request, res: Response) => {
+  return res.json({
+    ok: true,
+    fullName: "ศิรวิทย์ อินทจักร์",
+    studentId: "680610719",
+  });
+});
 
 app.listen(port, async () => {
   console.log(`🚀 Server running on http://localhost:${port}`);

@@ -6,7 +6,7 @@
 
 ชื่อ-สกุล : ศิรวิทย์ อินทจักร์
 
-Vercel URL : https://irxzleam-lab07-680610719-ejv3.vercel.app/
+Vercel URL : irxzleam-lab07-680610719-irxz.vercel.app
 
 ---
 

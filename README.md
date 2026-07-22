@@ -6,8 +6,7 @@
 
 ชื่อ-สกุล : ศิรวิทย์ อินทจักร์
 
-Vercel URL : irxzleam-lab07-680610719-irxz.vercel.app
-
+Vercel URL : https://irxzleam-lab07-680610719-irxz.vercel.app/
 ---
 
 หลังจากการ Fork และ Clone repository แล้ว, ให้เปิดโฟลเดอร์ด้วย VSCode และรันคำสั่งใน terminal:
